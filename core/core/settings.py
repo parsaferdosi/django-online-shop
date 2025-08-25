@@ -172,4 +172,4 @@ SWAGGER_SETTINGS = {
     },
     'USE_SESSION_AUTH': False,
 }
-USER_AUTH_MODEL = 'user.Account'
+AUTH_USER_MODEL = 'user.Account'

@@ -11,7 +11,7 @@ class AccountAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
         ('Personal Info', {'fields': ('first_name', 'last_name', 'phone_number', 'birth_date', 'bio', 'profile_picture')}),
-        ('Permissions', {'fields': ('groups', 'user_permissions','is_active', 'is_staff', 'is_superuser',)}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser','groups', 'user_permissions',)}),
         ('Important dates', {'fields': ('created_at', 'last_updated')}),
     )
     add_fieldsets = (
@@ -20,7 +20,7 @@ class AccountAdmin(UserAdmin):
             'fields': ('email', 'username', 'password1', 'password2')}
         ),
     )
-    filter_horizontal = ()
+    filter_horizontal = ('groups', 'user_permissions',)
     readonly_fields = ('created_at', 'last_updated')
 
 admin.site.register(Account, AccountAdmin)
