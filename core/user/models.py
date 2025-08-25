@@ -30,3 +30,28 @@ class Account(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+class Addresses(models.Model):
+    user_id=models.ForeignKey(Account,on_delete=models.CASCADE,related_name='addresses')
+    title=models.CharField(max_length=50)
+    description=models.TextField(null=True,blank=True)
+    zip_code=models.CharField(max_length=20)
+    country=models.ForeignKey('country',on_delete=models.CASCADE)
+    state=models.ForeignKey('state',on_delete=models.CASCADE)
+    city=models.ForeignKey('city',on_delete=models.CASCADE)
+    rest_of_address=models.TextField()
+    def __str__(self):
+        return f"{self.user_id.email} - {self.title}"
+class Country(models.Model):
+    name=models.CharField(max_length=50)
+    def __str__(self):
+        return self.name
+class State(models.Model):
+    name=models.CharField(max_length=50)
+    country_id=models.ForeignKey(Country,on_delete=models.CASCADE,related_name='states')
+    def __str__(self):
+        return self.name
+class City(models.Model):
+    name=models.CharField(max_length=50)
+    state_id=models.ForeignKey(State,on_delete=models.CASCADE,related_name='cities')
+    def __str__(self):
+        return self.name
