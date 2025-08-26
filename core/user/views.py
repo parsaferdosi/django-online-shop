@@ -1,11 +1,12 @@
 #ApiView based on DRF and django
-from user.serializer import AccountSerializer
-from user.models import Account
+from user.serializer import AccountSerializer,AddressSerializer
+from user.models import Account,Addresses
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework import status
+
 
 class MyAccountViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     """AccountViewSet is a viewset for managing user accounts.
@@ -55,3 +56,8 @@ class AdminAccountViewSet(ModelViewSet):
     serializer_class = AccountSerializer
     queryset = Account.objects.all()
     permission_classes = [IsAdminUser]
+class AddressesViewSet(ModelViewSet):
+    permission_classes=[IsAuthenticated]
+    serializer_class=AddressSerializer
+    def get_queryset(self):
+        return Addresses.objects.filter(user_id=self.request.user)
