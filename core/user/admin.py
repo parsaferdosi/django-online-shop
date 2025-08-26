@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Account
+from .models import Account,Addresses,Country,State,City
 
 class AccountAdmin(UserAdmin):
     # Customizing the admin interface for the Account model
@@ -22,5 +22,13 @@ class AccountAdmin(UserAdmin):
     )
     filter_horizontal = ('groups', 'user_permissions',)
     readonly_fields = ('created_at', 'last_updated')
-
+class AddressesAdmin(admin.ModelAdmin):
+    list_display = ('user_id','zip_code','country','state','country','is_default','rest_of_address')
+    search_fields = ('user_id__email', 'rest_of_address', 'city', 'state', 'zip_code', 'country')
+    list_filter = ('is_default','country')
+    ordering = ('user_id__email', 'city')
 admin.site.register(Account, AccountAdmin)
+admin.site.register(Addresses,AddressesAdmin)
+admin.site.register(Country)
+admin.site.register(State)
+admin.site.register(City)

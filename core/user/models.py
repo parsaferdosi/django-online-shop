@@ -39,6 +39,7 @@ class Addresses(models.Model):
     state=models.ForeignKey('state',on_delete=models.CASCADE)
     city=models.ForeignKey('city',on_delete=models.CASCADE)
     rest_of_address=models.TextField()
+    is_default=models.BooleanField(default=False)
     def __str__(self):
         return f"{self.user_id.email} - {self.title}"
 class Country(models.Model):
