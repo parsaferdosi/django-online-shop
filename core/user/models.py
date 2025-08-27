@@ -35,11 +35,15 @@ class Addresses(models.Model):
     title=models.CharField(max_length=50)
     description=models.TextField(null=True,blank=True)
     zip_code=models.CharField(max_length=20)
-    country=models.ForeignKey('country',on_delete=models.CASCADE)
-    state=models.ForeignKey('state',on_delete=models.CASCADE)
-    city=models.ForeignKey('city',on_delete=models.CASCADE)
+    country=models.ForeignKey('country',null=True,blank=False,on_delete=models.SET_NULL)
+    state=models.ForeignKey('state',null=True,blank=False,on_delete=models.SET_NULL)
+    city=models.ForeignKey('city',null=True,blank=False,on_delete=models.SET_NULL)
     rest_of_address=models.TextField()
     is_default=models.BooleanField(default=False)
+    def save(self,*args,**kwargs):
+        if self.is_default:
+            Addresses.objects.filter(user_id=self.user_id,is_default=True).exclude(pk=self.pk).update(is_default=False)
+        super().save(*args,**kwargs)
     def __str__(self):
         return f"{self.user_id.email} - {self.title}"
 class Country(models.Model):

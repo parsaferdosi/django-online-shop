@@ -6,7 +6,9 @@ from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework import status
-
+#swagger manual schema
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class MyAccountViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     """AccountViewSet is a viewset for managing user accounts.
@@ -61,3 +63,5 @@ class AddressesViewSet(ModelViewSet):
     serializer_class=AddressSerializer
     def get_queryset(self):
         return Addresses.objects.filter(user_id=self.request.user)
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user)
