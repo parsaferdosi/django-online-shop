@@ -36,7 +36,7 @@ class Product(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def average_stars(self):
-        result = self.comments.aggregate(avg=Avg("stars"))["avg"]
+        result = self.comments.filter(status = 'approved').aggregate(avg=Avg("stars"))["avg"]
         return result or 0
     
     def __str__(self):
