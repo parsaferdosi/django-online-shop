@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers 
 from .models import Product , Comment , Like , Category
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -43,7 +43,23 @@ class CommentSerializer(serializers.ModelSerializer):
         return obj.dislike_count()
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only = True)
+    class Meta:
+        model = Like
+        fields = '__all__'
 
+    def create(self , validated_data):
+        user = self.context['request'].user
+        comment = validated_data['comment']
+        return Like.objects.create(comment = comment , user = user ,is_like=validated_data.get('is_like', True))
+
+
+
+    
+
+  
+        
 
 
 

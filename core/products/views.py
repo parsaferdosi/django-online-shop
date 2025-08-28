@@ -1,7 +1,7 @@
-from django.shortcuts import render
-from rest_framework import viewsets , filters
-from .serializers import ProductSerializer
-from .models import Product
+from rest_framework.response import Response
+from rest_framework import viewsets , status
+from .serializers import ProductSerializer , LikeSerializer
+from .models import Product , Like
 from django.db.models import Avg
 # Create your views here.
 
@@ -31,3 +31,29 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = queryset.order_by("-avg_stars")
 
         return queryset
+    
+
+class LikeViewSet(viewsets.ViewSet):
+    
+    def create(self , request):
+        srz_data = LikeSerializer(data = request.data , context = {"request":request})
+        srz_data.is_valid(raise_exception=True)
+        comment = srz_data.validated_data['comment']
+        is_exists = Like.objects.filter(user = request.user , comment = comment).first()
+
+        if is_exists :
+            is_exists.delete()
+            return Response({"message":"Like removed"},status.HTTP_200_OK)
+        
+        like = srz_data.save()
+        action = "liked" if like.is_like else "disLiked"
+        return Response({"message":action} , status= status.HTTP_201_CREATED)
+        
+         
+    
+
+        
+        
+
+
+    
