@@ -7,6 +7,7 @@ from rest_framework.routers import DefaultRouter
 router=DefaultRouter()
 router.register(r'myaccount',views.MyAccountViewSet,basename='myaccount')
 router.register(r'admin/accounts',views.AdminAccountViewSet,basename='admin-accounts')
+router.register(r'addresses',views.AddressesViewSet,basename='addresses')
 urlpatterns =router.urls + [
     # Define your URL patterns here
     path('login/',TokenObtainPairView.as_view(),name='token_obtain_pair'),
