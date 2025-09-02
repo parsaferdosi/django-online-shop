@@ -173,3 +173,14 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,
 }
 AUTH_USER_MODEL = 'user.Account'
+
+
+#Google account
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'elicipher.website@gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = 'pzhrnbrhsuxisrzu'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'Eli Cipher website'

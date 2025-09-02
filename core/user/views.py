@@ -6,9 +6,15 @@ from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
 #swagger manual schema
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import jwt
+from django.conf import settings
+from utils.verify_token_generator import generate_and_send_verify_jwt
+from .models import Account
+
 
 class MyAccountViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     """AccountViewSet is a viewset for managing user accounts.
@@ -32,8 +38,13 @@ class MyAccountViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, D
     def get_object(self):
         """get the user account object based on the authenticated user"""
         return self.request.user
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+    
+    def perform_create(self, serializer):
+
+        user = serializer.save()
+        generate_and_send_verify_jwt(user)
+        return Response({"message":"لطفا برای تایید حساب کاربریتان ایمیل را چک کنید"},status=status.HTTP_200_OK)
+     
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -65,3 +76,32 @@ class AddressesViewSet(ModelViewSet):
         return Addresses.objects.filter(user_id=self.request.user)
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user)
+
+
+class SendVerifyLinkAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self , request):
+        user = request.user
+        generate_and_send_verify_jwt(user)
+        return Response({"message":"لینک ارسال شد"},status=status.HTTP_200_OK)
+
+
+class VerifyAccountAPIView(APIView):
+
+    def get(self , request):
+        token = request.GET.get("token")
+        try :
+            payload = jwt.decode(token , settings.SECRET_KEY , algorithms=["HS256"])
+            if payload.get("purpose") != "verify_account" :
+                return Response({"message":"توکن نامعتبر است "}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = Account.objects.get(id = payload.get("user_id"))
+            user.is_verified = True
+            user.save()
+            return Response({"message":"حساب کاربری شما با موفقیت تایید شد"}, status=status.HTTP_200_OK)
+        except Account.DoesNotExist:
+            return Response({"message":"کاربر یافت نشد"}, status=status.HTTP_404_NOT_FOUND)
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "لینک منقضی شده"}, status=400)
+        except jwt.InvalidTokenError:
+            return Response({"error": "توکن نامعتبر است"}, status=400)
