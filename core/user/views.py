@@ -1,5 +1,5 @@
 #ApiView based on DRF and django
-from user.serializer import AccountSerializer,AddressSerializer
+from user.serializer import AccountSerializer,AddressSerializer , ResetPasswordSerializer , SendResetPasswordSerializer
 from user.models import Account,Addresses
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
@@ -12,8 +12,9 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 import jwt
 from django.conf import settings
-from utils.verify_token_generator import generate_and_send_verify_jwt
+from utils.verify_token_generator import GenerateJWT
 from .models import Account
+from django.shortcuts import get_object_or_404
 
 
 class MyAccountViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
@@ -42,7 +43,7 @@ class MyAccountViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, D
     def perform_create(self, serializer):
 
         user = serializer.save()
-        generate_and_send_verify_jwt(user)
+        GenerateJWT.generate_verify_jwt(user)
         return Response({"message":"لطفا برای تایید حساب کاربریتان ایمیل را چک کنید"},status=status.HTTP_200_OK)
      
     def retrieve(self, request, *args, **kwargs):
@@ -79,14 +80,49 @@ class AddressesViewSet(ModelViewSet):
 
 
 class SendVerifyLinkAPIView(APIView):
+    """
+    Send Verify link API View
+    -------------------------------
+    Methode : GET
+
+    Description : 
+        Send verify link from email to user.
+
+    Permissions : 
+        IsAuthenticated
+
+    Request:
+        No body required.
+        Authentication token must be sent in the request header.
+
+    """
     permission_classes = [IsAuthenticated]
     def get(self , request):
         user = request.user
-        generate_and_send_verify_jwt(user)
+        GenerateJWT.generate_verify_jwt(user)
         return Response({"message":"لینک ارسال شد"},status=status.HTTP_200_OK)
+    
+
+
+
 
 
 class VerifyAccountAPIView(APIView):
+    """
+    Verify Account API View
+    -------------------------------
+
+    This endpoint is used to verify a user's account using a JWT verification token.
+
+    Method:
+        GET:
+            - Requires a valid JWT verification token passed as a query parameter (?token=<token>).
+            - Decodes and validates the token (checks expiration, validity, and purpose).
+            - If valid, marks the user's account as verified (`is_verified = True`).
+
+    Request Query Parameters:
+        token (str) : A valid JWT token with purpose = "verify_account".
+    """
 
     def get(self , request):
         token = request.GET.get("token")
@@ -105,3 +141,93 @@ class VerifyAccountAPIView(APIView):
             return Response({"error": "لینک منقضی شده"}, status=400)
         except jwt.InvalidTokenError:
             return Response({"error": "توکن نامعتبر است"}, status=400)
+
+
+class SendRestPasswordAPIView(APIView):
+    """
+    Send Rest Password API View
+
+    -------------------------------
+    Methode :
+        (GET) : When the user authenticated and have request
+        (POST) : When user forgoted password and want login
+
+    descriptions :
+        This view send rest password link for user , then user
+        can change his password.
+
+    Permissions :
+        (GET) : IsAuthenticated
+        (POST) : AllowAny
+
+    """
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            permission_classes = [IsAuthenticated]
+        else :
+            permission_classes= [AllowAny]
+        
+        return [permission() for permission in permission_classes]
+
+    def get(self , request):
+        user = request.user
+        GenerateJWT.generate_reset_password_jwt(user)
+        return Response({"message":"لینک با موفقیت ارسال شد لطفا ایمیلتان را چک کنید"})
+    
+    def post(self , request):
+        srz_data = SendResetPasswordSerializer(data = request.data)
+        if srz_data.is_valid():
+            email = srz_data.validated_data.get("email")
+            user = get_object_or_404(Account , email = email)
+            GenerateJWT.generate_reset_password_jwt(user)
+            return Response({"message":"لینک ارسال شد"},status=status.HTTP_200_OK)
+        return Response(srz_data.errors , status=status.HTTP_400_BAD_REQUEST)
+      
+
+
+class ChangeRestPasswordAPIView(APIView):
+    """
+    Change Password API View
+    -------------------------------
+
+    This endpoint allows a user to change their password using a valid reset token.
+
+    Method:
+        POST:
+            - Requires a valid JWT reset token passed as a query parameter (?token=<token>).
+            - Validates the token (checks expiration, validity, and purpose).
+            - Accepts `password` and `confirm_password` in the request body.
+            - If the token and data are valid, the user's password will be updated.
+
+    Request Query Parameters:
+        token (str) : A valid JWT reset token with purpose = "reset_password".
+
+    """
+
+    def post(self , request ):
+        
+        token = request.GET.get("token")
+        try :
+            payload = jwt.decode(token ,  settings.SECRET_KEY  ,algorithms=["HS256"] )
+            if payload.get("purpose") != "reset_password":
+                return Response({"message":"توکن نامعتبر است "}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = get_object_or_404(Account , pk = payload["user_id"])
+            srz_data =ResetPasswordSerializer(data = request.data)
+            if srz_data.is_valid():
+                srz_data.save(user=user)
+                return Response({"message": "پسورد شما با موفقیت عوض شد"}, status=status.HTTP_200_OK)
+
+            return Response(srz_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "لینک منقضی شده"}, status=400)
+        except jwt.InvalidTokenError:
+            return Response({"error": "توکن نامعتبر است"}, status=400)
+
+                
+
+
+
+            

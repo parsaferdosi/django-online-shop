@@ -17,5 +17,7 @@ urlpatterns =router.urls + [
     path('token/refresh/',TokenRefreshView.as_view(),name='token_refresh'),
     path('verify/',views.VerifyAccountAPIView.as_view(),name='verify_account'),
     path('send_verify_link/',views.SendVerifyLinkAPIView.as_view(),name='send_link'),
+    path('send_reset_password/',views.SendRestPasswordAPIView.as_view(),name='send_link'),
+    path('reset_password/',views.ChangeRestPasswordAPIView.as_view(),name='reset_password'),
     
 ]
