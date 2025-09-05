@@ -4,7 +4,7 @@ from .models import Account,Addresses,Country,State,City
 
 class AccountAdmin(UserAdmin):
     # Customizing the admin interface for the Account model
-    list_display = ('email', 'username', 'is_active', 'is_staff',)
+    list_display = ('email', 'username', 'is_active', 'is_staff','is_verified')
     list_filter = ('is_active', 'is_staff',)
     search_fields = ('email', 'username')
     ordering = ('email',)
