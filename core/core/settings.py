@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     #local apps
     'user',
     'products.apps.ProductsConfig',
+    'cart',
 
     
 ]
