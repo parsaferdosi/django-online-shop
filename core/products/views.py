@@ -3,7 +3,8 @@ from rest_framework import viewsets , status , generics , mixins
 from .serializers import ProductSerializer , LikeSerializer , CommentSerializer
 from .models import Product , Like , Comment
 from django.db.models import Avg
-
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerOrReadOnly
 
 # Create your views here.
 
@@ -54,7 +55,7 @@ class CommentViewset(viewsets.ModelViewSet):
     """
     serializer_class = CommentSerializer
     queryset =Comment.objects.all()
-
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     def get_queryset(self ): 
         queryset =Comment.objects.all()
         product_slug = self.kwargs['product_slug']
@@ -88,7 +89,7 @@ class LikeViewSet(viewsets.ViewSet):
     - Request: {"comment": <id>, "is_like": true/false}
     - Response: {"message": "liked" / "disLiked" / "Like removed"}
     """
-
+    permission_classes = [IsAuthenticated ]
     def create(self , request):
         srz_data = LikeSerializer(data = request.data , context = {"request":request})
         srz_data.is_valid(raise_exception=True)
