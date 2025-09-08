@@ -22,6 +22,18 @@ class Product(models.Model):
         ('available', 'موجود'),
         ('unavailable', 'ناموجود'),
     ]
+    
+    APPROVAL_STATUS = [
+        ('pending', 'در انتظار تایید'),
+        ('approved', 'تایید شده'),
+        ('rejected', 'رد شده'),
+    ]
+
+    PUBLISH_STATUS = [
+        ('draft', 'پیشنویس'),
+        ('published', 'منتشر شده'),
+    ]
+
 
     title = models.CharField(max_length=250)
     slug = models.SlugField(unique= True)
@@ -30,10 +42,13 @@ class Product(models.Model):
     category = models.ManyToManyField(Category , related_name="cat_products")
     price = models.PositiveIntegerField(default=0)
     status = models.CharField(choices=STATUS_CHOICE , max_length=100)
+    approval = models.CharField(choices=APPROVAL_STATUS , default='pending')
+    publish = models.CharField(choices=PUBLISH_STATUS , default='draft')
     quantity = models.PositiveIntegerField(default=0)
-    seller = models.ForeignKey(User , on_delete=models.CASCADE , related_name="user_products")
+    user = models.ForeignKey(User , on_delete=models.CASCADE , related_name="user_products")
     created_at = models.DateTimeField(auto_now_add= True)
     updated = models.DateTimeField(auto_now=True)
+    
 
     def average_stars(self):
         result = self.comments.filter(status = 'approved').aggregate(avg=Avg("stars"))["avg"]
@@ -48,6 +63,7 @@ class Comment(models.Model):
     STATUS_CHOICES = [
         ('approved', 'تأیید شده'),
         ('pending', 'در انتظار تأیید'),
+        ('rejected', 'رد شده'),
     ]
 
 

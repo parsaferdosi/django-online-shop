@@ -21,14 +21,14 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 
     """
     serializer_class = ProductSerializer
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(publish = "published" , approval = "approved")
     lookup_field = 'slug'
 
     def get_queryset(self):
         queryset = super().get_queryset()
         slug = self.request.query_params.get("category")
         if slug :
-            queryset = queryset.filter(category__slug = slug)
+            queryset = queryset.filter(category__slug = slug ,publish = "published" , approval = "approved")
 
         queryset = queryset.annotate(avg_stars = Avg("comments__stars"))
         queryset = queryset.order_by("-avg_stars")
@@ -103,7 +103,78 @@ class LikeViewSet(viewsets.ViewSet):
         like = srz_data.save()
         action = "liked" if like.is_like else "disLiked"
         return Response({"message":action} , status= status.HTTP_201_CREATED)
-               
+
+class ProductManagerViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing products owned by the authenticated user.
+
+    Features:
+        - List products created by the authenticated user.
+        - Create new products (automatically assigned to the current user).
+        - Update products (only allowed for the product owner).
+        - Delete products (only allowed for the product owner).
+        - Filter products by approval status.
+        - Filter products by publish status.
+
+    Permissions:
+        - Only authenticated users can access this endpoint.
+        - Only the owner of a product can update or delete it.
+        - Other users have read-only access.
+
+    Query Parameters (optional):
+        - approval: Filter products by approval status. 
+            Example → /api/products/?approval=approved
+        - publish: Filter products by publish status.
+            Example → /api/products/?publish=published
+
+    Choice Fields:
+        - STATUS_CHOICE:
+            * available   → Available (موجود)
+            * unavailable → Unavailable (ناموجود)
+
+        - APPROVAL_STATUS:
+            * pending  → Pending approval (در انتظار تایید)
+            * approved → Approved (تایید شده)
+            * rejected → Rejected (رد شده)
+
+        - PUBLISH_STATUS:
+            * draft     → Draft (پیشنویس)
+            * published → Published (منتشر شده)
+
+    Methods:
+        - get_queryset:
+            Returns the queryset of products belonging to the current user.
+            Applies filters based on 'approval' and 'publish' query parameters
+            if they are provided.
+        - perform_create:
+            Automatically assigns the currently authenticated user as the
+            owner when creating a new product.
+    """
+    permission_classes = [IsAuthenticated , IsOwnerOrReadOnly]
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+
+
+    def get_queryset(self):
+
+        queryset = Product.objects.filter(user = self.request.user)
+        approval = self.request.query_params.get("approval")
+        publish = self.request.query_params.get("publish")
+        if approval :
+            queryset = queryset.filter(approval = approval)
+            return queryset
+        
+        if publish :
+            queryset = queryset.filter(publish = publish)
+            return queryset
+        
+        return queryset
+    
+    def perform_create(self, serializer):
+        serializer.save(user = self.request.user)
+
+
+    
     
 
         
