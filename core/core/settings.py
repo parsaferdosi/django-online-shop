@@ -185,7 +185,7 @@ SWAGGER_SETTINGS = {
     },
     'USE_SESSION_AUTH': False,
 }
-AUTH_USER_MODEL = 'user.Account'
+AUTH_USER_MODEL = 'core.user.Account'
 
 
 #Google account
