@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import Product , Comment , Like , Category
+from core.products.models import Product , Comment , Like , Category
 
 class CategorySerializer(serializers.ModelSerializer):
     parent = serializers.StringRelatedField()

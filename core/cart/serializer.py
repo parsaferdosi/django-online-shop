@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from cart.models import cart, cart_item , cart_status,payment_status
+from core.cart.models import cart, cart_item , cart_status,payment_status
 
 class CartSerializer(ModelSerializer):
     class Meta:

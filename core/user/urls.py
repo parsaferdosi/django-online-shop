@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from user import views
+from core.user import views
 #using DRF router to automatically generate URL patterns for the viewsets
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers

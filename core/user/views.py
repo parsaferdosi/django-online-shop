@@ -1,6 +1,6 @@
 #ApiView based on DRF and django
-from user.serializer import AccountSerializer,AddressSerializer , ResetPasswordSerializer , SendResetPasswordSerializer
-from user.models import Account,Addresses
+from core.user.serializer import AccountSerializer,AddressSerializer , ResetPasswordSerializer , SendResetPasswordSerializer
+from core.user.models import Account,Addresses
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from rest_framework.viewsets import GenericViewSet,ModelViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
@@ -13,7 +13,6 @@ from drf_yasg import openapi
 import jwt
 from django.conf import settings
 from utils.verify_token_generator import GenerateJWT
-from .models import Account
 from django.shortcuts import get_object_or_404
 
 

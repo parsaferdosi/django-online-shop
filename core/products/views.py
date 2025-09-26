@@ -1,10 +1,10 @@
 from rest_framework.response import Response
 from rest_framework import viewsets , status , generics , mixins
-from .serializers import ProductSerializer , LikeSerializer , CommentSerializer
-from .models import Product , Like , Comment
+from core.products.serializers import ProductSerializer , LikeSerializer , CommentSerializer
+from core.products.models import Product , Like , Comment
 from django.db.models import Avg
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsOwnerOrReadOnly
+from core.products.permissions import IsOwnerOrReadOnly
 
 # Create your views here.
 

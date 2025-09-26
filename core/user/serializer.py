@@ -1,6 +1,6 @@
 #thie file is used to define serializers for user models
 from rest_framework import serializers
-from .models import Account,Addresses
+from core.user.models import Account,Addresses
 import re
 # Serializer for the Account model
 class AccountSerializer(serializers.ModelSerializer):

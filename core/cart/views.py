@@ -1,5 +1,5 @@
-from cart.serializer import CartSerializer, CartItemSerializer,cartStatusSerializer,paymentStatusSerializer
-from cart.models import cart, cart_item, cart_status, payment_status
+from core.cart.serializer import CartSerializer, CartItemSerializer,cartStatusSerializer,paymentStatusSerializer
+from core.cart.models import cart, cart_item, cart_status, payment_status
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 

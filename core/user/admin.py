@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Account,Addresses,Country,State,City
+from core.user.models import Account,Addresses,Country,State,City
 
 class AccountAdmin(UserAdmin):
     # Customizing the admin interface for the Account model

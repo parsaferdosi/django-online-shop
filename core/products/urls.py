@@ -1,6 +1,6 @@
 from django.urls import path , include
 from rest_framework_nested import routers
-from .views import ProductViewSet , LikeViewSet , CommentViewset , ProductManagerViewSet
+from core.products.views import ProductViewSet , LikeViewSet , CommentViewset , ProductManagerViewSet
 
 router = routers.DefaultRouter()
 router.register(r'product', ProductViewSet, basename='product')

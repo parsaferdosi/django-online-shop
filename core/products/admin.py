@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product , Category , Comment , Like
+from core.products.models import Product , Category , Comment , Like
 # Register your models here.
 
 
