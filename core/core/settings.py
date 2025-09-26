@@ -48,9 +48,9 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     #local apps
-    'user.apps.UserConfig',
-    'products.apps.ProductsConfig',
-    'cart.apps.CartConfig',
+    'core.user.apps.UserConfig',
+    'core.products.apps.ProductsConfig',
+    'core.cart.apps.CartConfig',
 
     
 ]
