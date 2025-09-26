@@ -12,7 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 import jwt
 from django.conf import settings
-from utils.verify_token_generator import GenerateJWT
+from core.utils.verify_token_generator import GenerateJWT
 from django.shortcuts import get_object_or_404
 
 
