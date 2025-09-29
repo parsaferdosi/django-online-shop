@@ -1,6 +1,6 @@
 from django.urls import path , include
 from rest_framework_nested import routers
-from core.products.views import ProductViewSet , LikeViewSet , CommentViewset , ProductManagerViewSet
+from core.products.views import ProductViewSet , LikeViewSet , CommentViewset , ProductManagerViewSet,ProductSearchAPI
 
 router = routers.DefaultRouter()
 router.register(r'product', ProductViewSet, basename='product')
@@ -13,6 +13,6 @@ router.register(r'comment_like', LikeViewSet, basename='like_dislike')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('',include(product_router.urls))
-    
+    path('',include(product_router.urls)),
+    path('search/',ProductSearchAPI.as_view(),name='product-search')
 ]

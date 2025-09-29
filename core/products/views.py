@@ -1,5 +1,6 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from rest_framework import viewsets , status , generics , mixins
+from rest_framework import viewsets , status , generics , mixins, filters
 from core.products.serializers import ProductSerializer , LikeSerializer , CommentSerializer
 from core.products.models import Product , Like , Comment
 from django.db.models import Avg
@@ -172,13 +173,14 @@ class ProductManagerViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(user = self.request.user)
-
-
-    
-    
-
-        
-        
-
-
+class ProductSearchAPI(generics.ListAPIView):
+    queryset=Product.objects.all()
+    serializer_class=ProductSerializer
+    filter_backends=[filters.SearchFilter,
+                    filters.OrderingFilter,
+                    DjangoFilterBackend
+                     ]
+    search_fields=['title']
+    ordering_fields = ['created_at']
+    filterset_fields=['category']
     
